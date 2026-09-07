@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -37,6 +39,7 @@ import com.yogaflow.ui.screens.PosesLibraryScreen
 import com.yogaflow.ui.screens.PracticePlayerScreen
 import com.yogaflow.ui.screens.ProfileScreen
 import com.yogaflow.ui.screens.ProgressStreakScreen
+import com.yogaflow.ui.screens.SplashScreen
 import com.yogaflow.ui.theme.MyApplicationTheme
 import com.yogaflow.ui.viewmodel.YogaViewModel
 import com.yogaflow.ui.viewmodel.YogaViewModelFactory
@@ -103,9 +106,34 @@ fun YogaFlowApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Home.route,
+            startDestination = "splash",
             modifier = Modifier.padding(innerPadding)
         ) {
+
+            // 1. ADD THIS NEW SPLASH ROUTER
+            composable("splash") {
+                val profiles by viewModel.allProfiles.collectAsStateWithLifecycle()
+
+                // 1. Draw the clean UI from your new file
+                SplashScreen()
+
+                // 2. Handle the routing logic
+                LaunchedEffect(profiles) {
+                    profiles?.let { loadedProfiles ->
+                        if (loadedProfiles.isNotEmpty()) {
+                            val existingUser = loadedProfiles.first()
+                            viewModel.switchUser(existingUser.id)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo("splash") { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(Screen.Onboarding.route) {
+                                popUpTo("splash") { inclusive = true }
+                            }
+                        }
+                    }
+                }
+            }
             // Home / Dashboard
             composable(Screen.Home.route) {
                 HomeScreen(
@@ -238,13 +266,16 @@ fun YogaFlowApp(
 
             // Onboarding Flow
             composable(Screen.Onboarding.route) {
+                val profile by viewModel.userProfile.collectAsStateWithLifecycle()
+                val isCreated = profile != null
                 OnboardingScreen(
                     viewModel = viewModel,
                     onComplete = {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
                         }
-                    }
+                    },
+                    isProfileAlreadyCreated =isCreated
                 )
             }
 

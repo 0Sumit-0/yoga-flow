@@ -1,5 +1,6 @@
 package com.yogaflow.ui.screens
 
+import AssetSvgPoseArtwork
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -52,7 +53,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yogaflow.ui.components.CalmPoseArtwork
 import com.yogaflow.ui.theme.BorderSubtle
 import com.yogaflow.ui.theme.CharcoalDark
 import com.yogaflow.ui.theme.CharcoalMuted
@@ -346,9 +346,9 @@ fun PracticePlayerScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (currentPose != null) {
-                        CalmPoseArtwork(
-                            iconType = currentPose.iconType,
-                            size = 110.dp,
+                        AssetSvgPoseArtwork(
+                            iconSvgType = currentPose.slug,
+                            size = 200.dp,
                             accentColor = SagePrimary
                         )
                     }

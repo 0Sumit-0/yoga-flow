@@ -43,8 +43,8 @@ class YogaViewModel(private val repository: YogaRepository) : ViewModel() {
     val currentUserId: StateFlow<String> = _currentUserId.asStateFlow()
 
     // All registered profiles
-    val allProfiles: StateFlow<List<UserProfile>> = repository.getAllProfiles()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val allProfiles: StateFlow<List<UserProfile>?> = repository.getAllProfiles()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // Active User Profile
     val userProfile: StateFlow<UserProfile?> = _currentUserId
@@ -161,14 +161,14 @@ class YogaViewModel(private val repository: YogaRepository) : ViewModel() {
     fun signInOrCreateUser(email: String, name: String) {
         val userId = if (email.isNotBlank()) "user_${email.replace("[^a-zA-Z0-9]".toRegex(), "_")}" else "user_${System.currentTimeMillis()}"
         viewModelScope.launch {
-            val existing = allProfiles.value.firstOrNull { it.id == userId || (it.email.isNotBlank() && it.email == email) }
+            val existing = allProfiles.value?.firstOrNull { it.id == userId || (it.email.isNotBlank() && it.email == email) }
             if (existing != null) {
                 _currentUserId.value = existing.id
             } else {
                 val newProfile = UserProfile(
                     id = userId,
                     email = email,
-                    name = if (name.isNotBlank()) name else "Yoga Practitioner",
+                    name = name.ifBlank { "Yoga Practitioner" },
                     createdAt = System.currentTimeMillis()
                 )
                 repository.saveProfile(newProfile)

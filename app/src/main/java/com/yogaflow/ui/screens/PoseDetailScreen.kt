@@ -1,5 +1,6 @@
 package com.yogaflow.ui.screens
 
+import AssetSvgPoseArtwork
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogaflow.data.model.YogaPose
-import com.yogaflow.ui.components.CalmPoseArtwork
 import com.yogaflow.ui.components.YogaTopBar
 import com.yogaflow.ui.theme.BorderSubtle
 import com.yogaflow.ui.theme.CharcoalDark
@@ -122,9 +122,9 @@ fun PoseDetailScreen(
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CalmPoseArtwork(
-                    iconType = pose.iconType,
-                    size = 180.dp,
+                AssetSvgPoseArtwork(
+                    iconSvgType = pose.slug,
+                    size = 260.dp,
                     accentColor = SagePrimary
                 )
             }

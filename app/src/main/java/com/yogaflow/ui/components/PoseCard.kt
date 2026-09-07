@@ -1,5 +1,6 @@
 package com.yogaflow.ui.components
 
+import AssetSvgPoseArtwork
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,8 +74,8 @@ fun PoseCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Calm Zen Pose Artwork
-            CalmPoseArtwork(
-                iconType = pose.iconType,
+            AssetSvgPoseArtwork(
+                iconSvgType = pose.slug,
                 size = 78.dp,
                 accentColor = SagePrimary
             )

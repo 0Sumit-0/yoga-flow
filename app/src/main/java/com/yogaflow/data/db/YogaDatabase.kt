@@ -54,20 +54,14 @@ abstract class YogaDatabase : RoomDatabase() {
                 super.onCreate(db)
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-//                        populateInitialData(database.yogaDao())
+                        populateInitialData(database.yogaDao())
                     }
                 }
             }
         }
 
-//        suspend fun populateInitialData(dao: YogaDao) {
-//            dao.insertPoses(InitialData.poses)
-//            // Seed a starter profile if none exists
-//            dao.saveProfile(InitialData.defaultProfile)
-//            // Seed 1-2 initial favorites to demonstrate custom plan
-//            InitialData.initialFavorites.forEach { dao.addFavorite(it) }
-//            // Seed sample past completion for calendar demonstration
-//            InitialData.initialCompletions.forEach { dao.logCompletion(it) }
-//        }
+        suspend fun populateInitialData(dao: YogaDao) {
+            dao.insertPoses(InitialData.poses)
+        }
     }
 }

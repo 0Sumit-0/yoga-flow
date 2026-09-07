@@ -1,5 +1,6 @@
 package com.yogaflow.ui.screens
 
+import AssetSvgPoseArtwork
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogaflow.data.model.TargetPlan
-import com.yogaflow.ui.components.CalmPoseArtwork
 import com.yogaflow.ui.components.YogaTopBar
 import com.yogaflow.ui.theme.BorderSubtle
 import com.yogaflow.ui.theme.CharcoalDark
@@ -285,8 +285,8 @@ fun PlanDetailScreen(
 
                         Spacer(modifier = Modifier.width(12.dp))
 
-                        CalmPoseArtwork(
-                            iconType = pose.iconType,
+                        AssetSvgPoseArtwork(
+                            iconSvgType = pose.slug,
                             size = 54.dp,
                             accentColor = SagePrimary
                         )

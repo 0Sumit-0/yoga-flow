@@ -94,6 +94,9 @@ dependencies {
   implementation(libs.okhttp)
   // implementation(libs.play.services.location)
   implementation(libs.retrofit)
+  implementation("io.coil-kt:coil-compose:2.5.0") // For Jetpack Compose
+  implementation("io.coil-kt:coil-svg:2.5.0")     // Essential for SVG support
+
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)
   testImplementation(libs.androidx.junit)

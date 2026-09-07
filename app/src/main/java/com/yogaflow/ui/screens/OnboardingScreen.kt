@@ -67,6 +67,7 @@ import com.yogaflow.ui.viewmodel.YogaViewModel
 fun OnboardingScreen(
     viewModel: YogaViewModel,
     onComplete: () -> Unit,
+    isProfileAlreadyCreated: Boolean=false,
     modifier: Modifier = Modifier
 ) {
     var step by remember { mutableStateOf(1) } // 1: Name & Age, 2: Level & Gender, 3: Goals
@@ -138,27 +139,36 @@ fun OnboardingScreen(
                     )
                 )
 
-                Text(
-                    text = "Skip",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        color = SagePrimary,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    modifier = Modifier
-                        .clickable {
-                            val profile = UserProfile(
-                                id = "user_default",
-                                name = if (name.isNotBlank()) name else "Elena",
-                                age = ageText.toIntOrNull() ?: 28,
-                                gender = gender,
-                                level = experienceLevel,
-                                goals = selectedGoals.toList()
-                            )
-                            viewModel.saveProfile(profile)
-                            onComplete()
-                        }
-                        .testTag("onboarding_btn_skip")
-                )
+                if (isProfileAlreadyCreated){
+                    Text(
+                        text = "Skip",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = SagePrimary,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        modifier = Modifier
+                            .clickable {
+                                if (!isProfileAlreadyCreated){
+                                    val profile = UserProfile(
+                                        id = "user_${System.currentTimeMillis()}", // Creates a unique ID
+                                        name = name.ifBlank { "Elena" },           // Cleaner fallback syntax
+                                        age = ageText.toIntOrNull() ?: 28,
+                                        gender = gender,
+                                        level = experienceLevel,
+                                        goals = selectedGoals.toList()
+                                    )
+                                    viewModel.saveProfile(profile)
+
+                                }
+                                onComplete()
+
+                            }
+                            .testTag("onboarding_btn_skip")
+                    )
+                }else {
+                    // Keeps the layout balanced when Skip is hidden
+                    Box(modifier = Modifier.size(48.dp))
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -484,8 +494,8 @@ fun OnboardingScreen(
                         step++
                     } else {
                         val profile = UserProfile(
-                            id = "user_default",
-                            name = if (name.isNotBlank()) name else "Practitioner",
+                            id = "user_${System.currentTimeMillis()}", // Creates a unique ID
+                            name = name.ifBlank { "Practitioner" },    // Cleaner fallback syntax
                             age = ageText.toIntOrNull() ?: 28,
                             gender = gender,
                             level = experienceLevel,

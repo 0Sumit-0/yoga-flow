@@ -16,5 +16,6 @@ data class YogaPose(
     val benefits: List<String>,
     val breathingCue: String,
     val modifications: String = "",
+    val pregnancyAllowed: Boolean=false,
     val iconType: String = "meditation"
 )

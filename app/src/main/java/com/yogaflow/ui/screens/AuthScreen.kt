@@ -229,7 +229,7 @@ fun AuthScreen(
             )
 
             // Switch profiles if any exist
-            if (allProfiles.isNotEmpty()) {
+            if (!allProfiles.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "Saved Profiles on this Device:",
@@ -242,7 +242,7 @@ fun AuthScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    allProfiles.forEach { p ->
+                    allProfiles?.forEach { p ->
                         Surface(
                             color = SageSubtle,
                             shape = RoundedCornerShape(10.dp),
