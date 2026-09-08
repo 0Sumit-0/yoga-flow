@@ -3,6 +3,8 @@ package com.yogaflow.ui.navigation
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Plans : Screen("plans")
+    
+    object Main : Screen("main")
     object PlanDetail : Screen("plan/{target}") {
         fun createRoute(target: String) = "plan/$target"
     }

@@ -43,49 +43,51 @@ data class BottomNavItem(
     val tag: String
 )
 
+private val BottomNavItems = listOf(
+    BottomNavItem(
+        title = "Home",
+        route = Screen.Home.route,
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home,
+        tag = "nav_home"
+    ),
+    BottomNavItem(
+        title = "Plans",
+        route = Screen.Plans.route,
+        selectedIcon = Icons.Filled.Spa,
+        unselectedIcon = Icons.Outlined.Spa,
+        tag = "nav_plans"
+    ),
+    BottomNavItem(
+        title = "Poses",
+        route = Screen.Poses.route,
+        selectedIcon = Icons.Filled.SelfImprovement,
+        unselectedIcon = Icons.Outlined.SelfImprovement,
+        tag = "nav_poses"
+    ),
+    BottomNavItem(
+        title = "Custom",
+        route = Screen.Favorites.route,
+        selectedIcon = Icons.Filled.Favorite,
+        unselectedIcon = Icons.Outlined.FavoriteBorder,
+        tag = "nav_favorites"
+    ),
+    BottomNavItem(
+        title = "Progress",
+        route = Screen.Progress.route,
+        selectedIcon = Icons.Filled.CalendarMonth,
+        unselectedIcon = Icons.Outlined.CalendarMonth,
+        tag = "nav_progress"
+    )
+)
+
 @Composable
 fun YogaBottomNav(
     currentRoute: String?,
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val items = listOf(
-        BottomNavItem(
-            title = "Home",
-            route = Screen.Home.route,
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home,
-            tag = "nav_home"
-        ),
-        BottomNavItem(
-            title = "Plans",
-            route = Screen.Plans.route,
-            selectedIcon = Icons.Filled.Spa,
-            unselectedIcon = Icons.Outlined.Spa,
-            tag = "nav_plans"
-        ),
-        BottomNavItem(
-            title = "Poses",
-            route = Screen.Poses.route,
-            selectedIcon = Icons.Filled.SelfImprovement,
-            unselectedIcon = Icons.Outlined.SelfImprovement,
-            tag = "nav_poses"
-        ),
-        BottomNavItem(
-            title = "Custom",
-            route = Screen.Favorites.route,
-            selectedIcon = Icons.Filled.Favorite,
-            unselectedIcon = Icons.Outlined.FavoriteBorder,
-            tag = "nav_favorites"
-        ),
-        BottomNavItem(
-            title = "Progress",
-            route = Screen.Progress.route,
-            selectedIcon = Icons.Filled.CalendarMonth,
-            unselectedIcon = Icons.Outlined.CalendarMonth,
-            tag = "nav_progress"
-        )
-    )
+
 
     NavigationBar(
         modifier = modifier
@@ -94,7 +96,7 @@ fun YogaBottomNav(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp
     ) {
-        items.forEach { item ->
+        BottomNavItems.forEach { item ->
             val isSelected = currentRoute == item.route
 
             NavigationBarItem(

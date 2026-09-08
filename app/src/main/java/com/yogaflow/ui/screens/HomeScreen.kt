@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogaflow.data.model.TargetPlan
+import com.yogaflow.data.model.mapGoalToPlanTarget
 import com.yogaflow.ui.components.PlanCard
 import com.yogaflow.ui.theme.BorderAccent
 import com.yogaflow.ui.theme.BorderSubtle
@@ -88,8 +89,9 @@ fun HomeScreen(
 
     // Determine primary recommended plan based on selected or default goal
     var selectedTarget by remember { mutableStateOf<String?>(null) }
-    val primaryGoal = selectedTarget ?: profile?.goals?.firstOrNull() ?: "Mental Focus"
-    val recommendedPlan = plans.firstOrNull { it.target.equals(primaryGoal, ignoreCase = true) } ?: plans.first()
+    val primaryGoal = mapGoalToPlanTarget(selectedTarget ?: profile?.goals?.firstOrNull() ?: "Stress Relief")
+    val recommendedPlan = plans.firstOrNull { it.target.equals(primaryGoal, ignoreCase = true) }
+        ?: plans.first()
 
     // Formatted current date e.g. "Wednesday, May 24"
     val formattedDate = remember {
@@ -207,8 +209,7 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(targetsList) { target ->
-                        val isSelected = target.equals(primaryGoal, ignoreCase = true) ||
-                            (target == "Deep Sleep" && primaryGoal.equals("Better Sleep", ignoreCase = true))
+                        val isSelected = mapGoalToPlanTarget(target) == primaryGoal
 
                         Surface(
                             shape = RoundedCornerShape(100.dp),
@@ -217,8 +218,7 @@ fun HomeScreen(
                             shadowElevation = if (isSelected) 1.dp else 0.dp,
                             modifier = Modifier
                                 .clickable {
-                                    val mapped = if (target == "Deep Sleep") "Better Sleep" else target
-                                    selectedTarget = mapped
+                                    selectedTarget = mapGoalToPlanTarget(target)
                                 }
                                 .testTag("target_tab_$target")
                         ) {

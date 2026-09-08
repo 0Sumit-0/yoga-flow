@@ -1,6 +1,6 @@
 package com.yogaflow.ui.screens
 
-import AssetSvgPoseArtwork
+import com.yogaflow.ui.components.AssetSvgPoseArtwork
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogaflow.data.model.TargetPlan
+import com.yogaflow.data.model.findBySlug
 import com.yogaflow.ui.components.YogaTopBar
 import com.yogaflow.ui.theme.BorderSubtle
 import com.yogaflow.ui.theme.CharcoalDark
@@ -247,7 +248,7 @@ fun PlanDetailScreen(
 
         // List of Poses in this Sequence
         itemsIndexed(plan.poses) { index, itemPose ->
-            val pose = allPoses.firstOrNull { it.slug == itemPose.poseSlug }
+            val pose = allPoses.findBySlug(itemPose.poseSlug)
             if (pose != null) {
                 Card(
                     modifier = Modifier

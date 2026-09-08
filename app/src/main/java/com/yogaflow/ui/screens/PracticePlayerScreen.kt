@@ -1,6 +1,6 @@
 package com.yogaflow.ui.screens
 
-import AssetSvgPoseArtwork
+import com.yogaflow.ui.components.AssetSvgPoseArtwork
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -63,6 +63,7 @@ import com.yogaflow.ui.theme.SageSubtle
 import com.yogaflow.ui.theme.SandContainer
 import com.yogaflow.ui.theme.SandTertiary
 import com.yogaflow.ui.viewmodel.YogaViewModel
+import com.yogaflow.data.model.findBySlug
 
 @Composable
 fun PracticePlayerScreen(
@@ -85,7 +86,7 @@ fun PracticePlayerScreen(
 
     val state = practiceState!!
     val currentPoseItem = state.poseItems.getOrNull(state.currentPoseIndex)
-    val currentPose = allPoses.firstOrNull { it.slug == currentPoseItem?.poseSlug }
+    val currentPose = allPoses.findBySlug(currentPoseItem?.poseSlug)
 
     // Overall progress
     val overallProgress = if (state.poseItems.isNotEmpty()) {
@@ -346,11 +347,7 @@ fun PracticePlayerScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (currentPose != null) {
-                        AssetSvgPoseArtwork(
-                            iconSvgType = currentPose.slug,
-                            size = 200.dp,
-                            accentColor = SagePrimary
-                        )
+                        PlayerPoseArtwork(slug = currentPose.slug)
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -502,4 +499,13 @@ fun PracticePlayerScreen(
             }
         }
     }
+}
+
+@Composable
+private fun PlayerPoseArtwork(slug: String) {
+    AssetSvgPoseArtwork(
+        iconSvgType = slug,
+        size = 200.dp,
+        accentColor = SagePrimary
+    )
 }

@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,11 +63,15 @@ fun PosesLibraryScreen(
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     val selectedTargetFilter by viewModel.selectedTargetFilter.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
-    val favSlugs = favorites.map { it.poseSlug }.toSet()
+    val favSlugs = remember(favorites) { favorites.map { it.poseSlug }.toSet() }
 
-    val difficulties = listOf("All", "Beginner", "Intermediate", "Advanced")
-    val targets = listOf("All", "Digestion", "Mental Focus", "Sleep", "Energy", "Stress Relief", "Flexibility")
-    val categories = listOf("All", "Seated", "Standing", "Backbend", "Inversion", "Restorative", "Forward Bend", "Balancing", "Twist")
+    val difficulties = remember { listOf("All", "Beginner", "Intermediate", "Advanced") }
+    val targets = remember {
+        listOf("All", "Digestion", "Mental Focus", "Sleep", "Energy", "Stress Relief", "Flexibility")
+    }
+    val categories = remember {
+        listOf("All", "Seated", "Standing", "Backbend", "Inversion", "Restorative", "Forward Bend", "Balancing", "Twist")
+    }
 
     LazyColumn(
         modifier = modifier
@@ -302,7 +307,7 @@ fun PosesLibraryScreen(
                 }
             }
         } else {
-            items(filteredPoses) { pose ->
+            items(filteredPoses, key = { it.slug }) { pose ->
                 Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
                     PoseCard(
                         pose = pose,

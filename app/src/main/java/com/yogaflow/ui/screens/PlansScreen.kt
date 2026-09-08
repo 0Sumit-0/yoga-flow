@@ -60,7 +60,7 @@ fun PlansScreen(
         "All",
         "Digestion",
         "Mental Focus",
-        "Sleep",
+        "Better Sleep",
         "Energy",
         "Stress Relief",
         "Flexibility"

@@ -9,6 +9,7 @@ import com.yogaflow.data.model.PracticeCompletion
 import com.yogaflow.data.model.TargetPlan
 import com.yogaflow.data.model.UserProfile
 import com.yogaflow.data.model.YogaPose
+import com.yogaflow.data.model.canonicalizePoseSlug
 import com.yogaflow.data.repository.StreakStats
 import com.yogaflow.data.repository.YogaRepository
 import kotlinx.coroutines.Job
@@ -180,12 +181,15 @@ class YogaViewModel(private val repository: YogaRepository) : ViewModel() {
     // Practice Flow Player Actions
     fun startPracticePlan(plan: TargetPlan) {
         timerJob?.cancel()
-        val firstPoseDuration = plan.poses.firstOrNull()?.durationSeconds ?: 60
+        val poseItems = plan.poses.map { item ->
+            item.copy(poseSlug = canonicalizePoseSlug(item.poseSlug) ?: item.poseSlug)
+        }
+        val firstPoseDuration = poseItems.firstOrNull()?.durationSeconds ?: 60
         _practiceState.value = ActivePracticeState(
             planId = plan.id,
             title = plan.title,
             target = plan.target,
-            poseItems = plan.poses,
+            poseItems = poseItems,
             currentPoseIndex = 0,
             secondsRemaining = firstPoseDuration,
             totalPoseDuration = firstPoseDuration,

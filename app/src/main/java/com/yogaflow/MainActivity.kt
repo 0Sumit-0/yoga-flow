@@ -1,18 +1,19 @@
 package com.yogaflow
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,16 +30,12 @@ import com.yogaflow.data.repository.YogaRepository
 import com.yogaflow.ui.components.YogaBottomNav
 import com.yogaflow.ui.navigation.Screen
 import com.yogaflow.ui.screens.AuthScreen
-import com.yogaflow.ui.screens.FavoritesCustomPlanScreen
-import com.yogaflow.ui.screens.HomeScreen
+import com.yogaflow.ui.screens.MainTabHost
 import com.yogaflow.ui.screens.OnboardingScreen
 import com.yogaflow.ui.screens.PlanDetailScreen
-import com.yogaflow.ui.screens.PlansScreen
 import com.yogaflow.ui.screens.PoseDetailScreen
-import com.yogaflow.ui.screens.PosesLibraryScreen
 import com.yogaflow.ui.screens.PracticePlayerScreen
 import com.yogaflow.ui.screens.ProfileScreen
-import com.yogaflow.ui.screens.ProgressStreakScreen
 import com.yogaflow.ui.screens.SplashScreen
 import com.yogaflow.ui.theme.MyApplicationTheme
 import com.yogaflow.ui.viewmodel.YogaViewModel
@@ -52,6 +49,18 @@ class MainActivity : ComponentActivity() {
         val database = YogaDatabase.getDatabase(this, lifecycleScope)
         val repository = YogaRepository(database.yogaDao())
         val factory = YogaViewModelFactory(repository)
+
+//        Coil.setImageLoader(
+//            ImageLoader.Builder(applicationContext)
+//                .components { add(SvgDecoder.Factory()) }
+//                .memoryCache {
+//                    MemoryCache.Builder(applicationContext)
+//                        .maxSizePercent(0.25)
+//                        .build()
+//                }
+//                .crossfade(false)
+//                .build()
+//        )
 
         setContent {
             MyApplicationTheme {
@@ -67,47 +76,28 @@ fun YogaFlowApp(
     viewModel: YogaViewModel,
     navController: NavHostController = rememberNavController()
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    var selectedTab by rememberSaveable { mutableStateOf(Screen.Home.route) }
 
-    // Top-level destinations that show the bottom navigation bar
-    val bottomNavRoutes = setOf(
-        Screen.Home.route,
-        Screen.Plans.route,
-        Screen.Poses.route,
-        Screen.Favorites.route,
-        Screen.Progress.route
-    )
 
-    val showBottomNav = currentRoute in bottomNavRoutes
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            AnimatedVisibility(
-                visible = showBottomNav,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
-            ) {
-                YogaBottomNav(
-                    currentRoute = currentRoute,
-                    onNavigate = { route ->
-                        navController.navigate(route) {
-                            popUpTo(Screen.Home.route) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
-            }
+            YogaFlowBottomBar(
+                navController = navController,
+                selectedTab = selectedTab,
+                onSelectTab = { selectedTab = it }
+            )
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = "splash",
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None }
         ) {
 
             // 1. ADD THIS NEW SPLASH ROUTER
@@ -123,7 +113,7 @@ fun YogaFlowApp(
                         if (loadedProfiles.isNotEmpty()) {
                             val existingUser = loadedProfiles.first()
                             viewModel.switchUser(existingUser.id)
-                            navController.navigate(Screen.Home.route) {
+                            navController.navigate(Screen.Main.route) {
                                 popUpTo("splash") { inclusive = true }
                             }
                         } else {
@@ -134,24 +124,13 @@ fun YogaFlowApp(
                     }
                 }
             }
-            // Home / Dashboard
-            composable(Screen.Home.route) {
-                HomeScreen(
+            composable(Screen.Main.route) {
+                MainTabHost(
+                    selectedTab = selectedTab,
                     viewModel = viewModel,
+                    onSelectTab = { selectedTab = it },
                     onNavigateToPlan = { target ->
                         navController.navigate(Screen.PlanDetail.createRoute(target))
-                    },
-                    onNavigateToPlans = {
-                        navController.navigate(Screen.Plans.route)
-                    },
-                    onNavigateToPoses = {
-                        navController.navigate(Screen.Poses.route)
-                    },
-                    onNavigateToCustom = {
-                        navController.navigate(Screen.Favorites.route)
-                    },
-                    onNavigateToProgress = {
-                        navController.navigate(Screen.Progress.route)
                     },
                     onNavigateToProfile = {
                         navController.navigate(Screen.Profile.route)
@@ -159,20 +138,13 @@ fun YogaFlowApp(
                     onStartPracticePlan = { plan ->
                         viewModel.startPracticePlan(plan)
                         navController.navigate(Screen.PracticePlayer.createRoute(plan.id))
-                    }
-                )
-            }
-
-            // Target-Based Plans List
-            composable(Screen.Plans.route) {
-                PlansScreen(
-                    viewModel = viewModel,
-                    onNavigateToPlanDetail = { target ->
-                        navController.navigate(Screen.PlanDetail.createRoute(target))
                     },
-                    onStartPracticePlan = { plan ->
-                        viewModel.startPracticePlan(plan)
-                        navController.navigate(Screen.PracticePlayer.createRoute(plan.id))
+                    onNavigateToPoseDetail = { slug ->
+                        navController.navigate(Screen.PoseDetail.createRoute(slug))
+                    },
+                    onStartCustomFlow = {
+                        viewModel.startCustomFavoritesPractice()
+                        navController.navigate(Screen.PracticePlayer.createRoute("custom_favorites"))
                     }
                 )
             }
@@ -197,22 +169,12 @@ fun YogaFlowApp(
                 )
             }
 
-            // Pose Library
-            composable(Screen.Poses.route) {
-                PosesLibraryScreen(
-                    viewModel = viewModel,
-                    onNavigateToPoseDetail = { slug ->
-                        navController.navigate(Screen.PoseDetail.createRoute(slug))
-                    }
-                )
-            }
-
             // Pose Detail View
             composable(
                 route = Screen.PoseDetail.route,
                 arguments = listOf(navArgument("slug") { type = NavType.StringType })
             ) { backStackEntry ->
-                val slug = backStackEntry.arguments?.getString("slug") ?: "childs-pose"
+                val slug = backStackEntry.arguments?.getString("slug") ?: "mountain_pose"
                 PoseDetailScreen(
                     slug = slug,
                     viewModel = viewModel,
@@ -224,29 +186,6 @@ fun YogaFlowApp(
                 )
             }
 
-            // Favorites & Custom Sequence
-            composable(Screen.Favorites.route) {
-                FavoritesCustomPlanScreen(
-                    viewModel = viewModel,
-                    onNavigateToPoseDetail = { slug ->
-                        navController.navigate(Screen.PoseDetail.createRoute(slug))
-                    },
-                    onNavigateToPosesLibrary = {
-                        navController.navigate(Screen.Poses.route)
-                    },
-                    onStartCustomFlow = {
-                        viewModel.startCustomFavoritesPractice()
-                        navController.navigate(Screen.PracticePlayer.createRoute("custom_favorites"))
-                    }
-                )
-            }
-
-            // Streak Calendar & Progress
-            composable(Screen.Progress.route) {
-                ProgressStreakScreen(
-                    viewModel = viewModel
-                )
-            }
 
             // Profile & Settings
             composable(Screen.Profile.route) {
@@ -271,11 +210,11 @@ fun YogaFlowApp(
                 OnboardingScreen(
                     viewModel = viewModel,
                     onComplete = {
-                        navController.navigate(Screen.Home.route) {
+                        navController.navigate(Screen.Main.route) {
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
                         }
                     },
-                    isProfileAlreadyCreated =isCreated
+                    isProfileAlreadyCreated = isCreated
                 )
             }
 
@@ -306,4 +245,20 @@ fun YogaFlowApp(
             }
         }
     }
+}
+
+@Composable
+private fun YogaFlowBottomBar(
+    navController: NavHostController,
+    selectedTab: String,
+    onSelectTab: (String) -> Unit
+) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val showBottomNav = currentRoute == Screen.Main.route
+    if (!showBottomNav) return
+    YogaBottomNav(
+        currentRoute = selectedTab,
+        onNavigate = onSelectTab
+    )
 }
