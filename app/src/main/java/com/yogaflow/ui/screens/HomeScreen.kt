@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yogaflow.data.model.TargetPlan
 import com.yogaflow.data.model.mapGoalToPlanTarget
 import com.yogaflow.ui.components.PlanCard
+import com.yogaflow.ui.components.WeeklyStreakCard
 import com.yogaflow.ui.theme.BorderAccent
 import com.yogaflow.ui.theme.BorderSubtle
 import com.yogaflow.ui.theme.LinenSurface
@@ -254,144 +255,12 @@ fun HomeScreen(
 
         // Section: Weekly Streak Card (7-day visual dots matching Natural Tones design)
         item {
-            val calendar = remember { Calendar.getInstance() }
-            val currentDayOfWeek = remember { calendar.get(Calendar.DAY_OF_WEEK) }
-            val dayNames = listOf("M", "T", "W", "T", "F", "S", "S")
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 6.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .clickable(onClick = onNavigateToProgress)
-                    .testTag("home_streak_banner"),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = PureWhite),
-                border = BorderStroke(1.dp, BorderSubtle),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Weekly Streak",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = NaturalOliveDark
-                            )
-                        )
-
-                        Surface(
-                            color = NaturalLightTint,
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "${streakStats.currentStreak} Day Streak",
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = NaturalOlivePrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        dayNames.forEachIndexed { index, dayLetter ->
-                            // Day index mapping (Monday=0 to Sunday=6)
-                            val dayNumber = 16 + index
-                            val isCompleted = index < 3 || (index == 2 && streakStats.practicedToday)
-                            val isToday = index == 2 // Wednesday in theme mockup or current mid-week
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = dayLetter,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = NaturalOliveDark,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
-                                    )
-                                )
-
-                                if (isToday && isCompleted) {
-                                    // Today with ring
-                                    Box(
-                                        modifier = Modifier
-                                            .size(34.dp)
-                                            .clip(CircleShape)
-                                            .background(NaturalOliveAccent.copy(alpha = 0.4f))
-                                            .padding(3.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .clip(CircleShape)
-                                                .background(NaturalOlivePrimary),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Check,
-                                                contentDescription = null,
-                                                tint = PureWhite,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    }
-                                } else if (isCompleted) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(34.dp)
-                                            .clip(CircleShape)
-                                            .background(NaturalOlivePrimary),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Check,
-                                            contentDescription = null,
-                                            tint = PureWhite,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(34.dp)
-                                            .clip(CircleShape)
-                                            .background(NaturalLightTint)
-                                            .border(1.dp, BorderSubtle, CircleShape),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "$dayNumber",
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                color = NaturalOliveDark,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            WeeklyStreakCard(
+                currentStreak = streakStats.currentStreak,
+                completedDates = streakStats.completedDatesSet,
+                onClick = onNavigateToProgress,
+                modifier = Modifier.testTag("home_streak_banner")
+            )
         }
 
         // Target Categories Quick Access
