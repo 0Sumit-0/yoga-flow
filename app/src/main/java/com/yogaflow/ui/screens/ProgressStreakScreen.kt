@@ -109,7 +109,7 @@ fun ProgressStreakScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Log Session",
+                            text = "Session",
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                         )
                     }

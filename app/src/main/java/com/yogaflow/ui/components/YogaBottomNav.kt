@@ -115,10 +115,13 @@ fun YogaBottomNav(
                 },
                 label = {
                     Text(
-                        text = item.title.uppercase(),
+                        text = item.title,
+                        maxLines = 1,
+                        softWrap = false,
                         style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 11.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                            letterSpacing = 0.8.sp
+                            letterSpacing = 0.2.sp
                         )
                     )
                 },
